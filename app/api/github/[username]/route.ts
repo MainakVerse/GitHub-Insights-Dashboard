@@ -1,7 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth" // ✅ avoids circular import
-
 import {
   fetchGitHubUser,
   fetchGitHubRepos,
@@ -28,11 +25,10 @@ export async function GET(
       )
     }
 
-    // ✅ Use logged-in user’s GitHub OAuth token OR fallback to PAT
-    const session = await getServerSession(authOptions)
-    const token = session?.accessToken || process.env.GITHUB_TOKEN
+    // ✅ Use a single backend token (no auth, rate-limit safe)
+    const token = process.env.GITHUB_TOKEN
 
-    // ✅ Fetch all data in parallel using the correct token
+    // ✅ Fetch all data in parallel
     const [user, repos, commitCalendar, organizations, contributions] =
       await Promise.all([
         fetchGitHubUser(username, token),
@@ -42,14 +38,14 @@ export async function GET(
         fetchGitHubContributions(username, token),
       ])
 
-    // ✅ Process repository-level data
+    // ✅ Process analytics
     const languageStats = calculateLanguageStats(repos)
     const topRepos = getTopRepos(repos, 5)
     const repoTimeline = getRepoCreationTimeline(repos)
     const commitActivity = getCommitActivitySummary(commitCalendar)
     const repoStats = getRepoStatsSummary(repos)
 
-    // ✅ Unified API response
+    // ✅ Unified final response
     const data = {
       user,
       stats: {
@@ -70,8 +66,8 @@ export async function GET(
       },
       languages: languageStats,
       commits: {
-        activity: commitActivity, // Weekly summary chart
-        contributions: commitCalendar, // Daily heatmap data
+        activity: commitActivity, // weekly trend
+        contributions: commitCalendar, // daily heatmap
       },
       organizations,
       lastUpdated: new Date().toISOString(),
@@ -85,6 +81,18 @@ export async function GET(
     })
   } catch (error) {
     console.error("GitHub API Error:", error)
+
+    // Graceful handling of GitHub rate limit
+    if (error instanceof Error && error.message.includes("rate limit")) {
+      return NextResponse.json(
+        {
+          error:
+            "GitHub API rate limit exceeded. Please wait a few minutes and try again.",
+        },
+        { status: 429 }
+      )
+    }
+
     return NextResponse.json(
       {
         error:

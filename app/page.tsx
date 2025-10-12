@@ -1,36 +1,15 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSession, signIn, signOut } from "next-auth/react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import {
-  GitBranch,
-  BarChart3,
-  Star,
-  TrendingUp,
-  Github,
-  LogIn,
-  LogOut,
-  Loader2,
-} from "lucide-react"
+import { Github, GitBranch, BarChart3, Star, TrendingUp } from "lucide-react"
 
 export default function LandingPage() {
   const [username, setUsername] = useState("")
   const router = useRouter()
-  const { data: session, status } = useSession()
-
-  // 🔁 Auto-redirect signed-in users to their own dashboard
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.login) {
-      router.replace(`/dashboard?user=${session.user.login}`)
-    }
-  }, [status, session, router])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,26 +18,16 @@ export default function LandingPage() {
     }
   }
 
-  // 🌀 While session is loading
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header (Sign in / Profile) */}
+      {/* Header */}
       <header className="flex items-center justify-between border-b border-border bg-card/50 px-6 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <Github className="h-5 w-5 text-primary" />
-          <span className="font-mono font-semibold text-foreground">GitHub Insight Dashboard</span>
+          <span className="font-mono font-semibold text-foreground">
+            GitHub Insight Dashboard
+          </span>
         </div>
-
-       
-        
       </header>
 
       {/* Hero Section */}
@@ -66,6 +35,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
         <div className="container relative mx-auto px-4 py-24 sm:py-32">
           <div className="mx-auto max-w-3xl text-center">
+            {/* Logo */}
             <div className="mb-8 flex justify-center">
               <div className="rounded-full bg-card p-6 shadow-lg ring-1 ring-border">
                 <Github className="h-16 w-16 text-primary" />
@@ -104,15 +74,24 @@ export default function LandingPage() {
 
             <p className="mt-4 text-sm text-muted-foreground">
               Try it with:{" "}
-              <button onClick={() => setUsername("MainakVerse")} className="font-mono text-primary hover:underline">
+              <button
+                onClick={() => setUsername("MainakVerse")}
+                className="font-mono text-primary hover:underline"
+              >
                 MainakVerse
               </button>
               ,{" "}
-              <button onClick={() => setUsername("gaearon")} className="font-mono text-primary hover:underline">
+              <button
+                onClick={() => setUsername("gaearon")}
+                className="font-mono text-primary hover:underline"
+              >
                 gaearon
               </button>
               , or{" "}
-              <button onClick={() => setUsername("tj")} className="font-mono text-primary hover:underline">
+              <button
+                onClick={() => setUsername("tj")}
+                className="font-mono text-primary hover:underline"
+              >
                 tj
               </button>
             </p>
@@ -124,7 +103,9 @@ export default function LandingPage() {
       <section className="border-b border-border py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-foreground">Understand Your GitHub Activity</h2>
+            <h2 className="mb-4 text-3xl font-bold text-foreground">
+              Understand Your GitHub Activity
+            </h2>
             <p className="mb-16 text-lg leading-relaxed text-muted-foreground">
               Get comprehensive insights into your development journey with real-time data visualization and analytics.
             </p>
@@ -160,7 +141,9 @@ export default function LandingPage() {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-foreground">Ready to Explore Your Data?</h2>
+            <h2 className="mb-4 text-3xl font-bold text-foreground">
+              Ready to Explore Your Data?
+            </h2>
             <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
               Enter your GitHub username and explore your data-driven journey. Discover patterns, track progress, and
               gain insights into your development workflow.
@@ -186,7 +169,7 @@ export default function LandingPage() {
   )
 }
 
-// 🧩 Small helper component for features
+// Helper for features
 function FeatureCard({
   icon,
   title,
@@ -199,7 +182,9 @@ function FeatureCard({
   return (
     <Card className="border-border bg-card transition-all hover:border-primary/50">
       <CardContent className="p-6">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">{icon}</div>
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+          {icon}
+        </div>
         <h3 className="mb-2 font-semibold text-card-foreground">{title}</h3>
         <p className="text-sm leading-relaxed text-muted-foreground">{desc}</p>
       </CardContent>

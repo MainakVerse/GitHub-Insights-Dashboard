@@ -73,13 +73,19 @@ function setCache(key: string, data: any) {
 /*                              USER INFORMATION                              */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchGitHubUser(username: string, token: any): Promise<GitHubUser> {
+export async function fetchGitHubUser(username: string, token: string): Promise<GitHubUser> {
   const cacheKey = `user:${username}`
   const cached = getCached<GitHubUser>(cacheKey)
   if (cached) return cached
 
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  }
+
+  if (token) headers.Authorization = `Bearer ${token}`
+
   const response = await fetch(`https://api.github.com/users/${username}`, {
-    headers: { Accept: "application/vnd.github.v3+json" },
+    headers,
     next: { revalidate: 300 },
   })
 
@@ -89,6 +95,7 @@ export async function fetchGitHubUser(username: string, token: any): Promise<Git
   setCache(cacheKey, data)
   return data
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                        FULL CONTRIBUTION COLLECTION                         */
@@ -204,12 +211,17 @@ export async function fetchGitHubContributions(
 /*                               REPOSITORY DATA                              */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchGitHubRepos(username: string, token: any): Promise<GitHubRepo[]> {
+export async function fetchGitHubRepos(username: string, token: string): Promise<GitHubRepo[]> {
   const cacheKey = `repos:${username}`
   const cached = getCached<GitHubRepo[]>(cacheKey)
   if (cached) return cached
 
-  const headers = { Accept: "application/vnd.github.v3+json" }
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  }
+
+  if (token) headers.Authorization = `Bearer ${token}`
+
   let allRepos: GitHubRepo[] = []
   let page = 1
   const perPage = 100
@@ -231,6 +243,7 @@ export async function fetchGitHubRepos(username: string, token: any): Promise<Gi
   setCache(cacheKey, allRepos)
   return allRepos
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                              ANALYTIC HELPERS                              */
@@ -321,13 +334,19 @@ export async function fetchCommitActivity(username: string, token?: string): Pro
 /*                              ORGANIZATIONS                                */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchUserOrganizations(username: string, token: any): Promise<any[]> {
+export async function fetchUserOrganizations(username: string, token: string): Promise<any[]> {
   const cacheKey = `orgs:${username}`
   const cached = getCached<any[]>(cacheKey)
   if (cached) return cached
 
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  }
+
+  if (token) headers.Authorization = `Bearer ${token}`
+
   const res = await fetch(`https://api.github.com/users/${username}/orgs`, {
-    headers: { Accept: "application/vnd.github.v3+json" },
+    headers,
     next: { revalidate: 300 },
   })
 
@@ -337,6 +356,7 @@ export async function fetchUserOrganizations(username: string, token: any): Prom
   setCache(cacheKey, data)
   return data
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                      WEEKLY ACTIVITY SUMMARY (CHARTS)                     */

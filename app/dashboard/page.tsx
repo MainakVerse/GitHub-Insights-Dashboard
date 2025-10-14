@@ -73,7 +73,7 @@ function DashboardContent() {
     )
   }
 
-  // Error
+  // Error State
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
@@ -101,6 +101,55 @@ function DashboardContent() {
 
   if (!data) return null
 
+  // ✅ Build Monthly Repo Timeline for 2025
+  const currentYear = 2025
+  const monthOrder = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ]
+
+  // Convert any timeline shape (array or object) into a unified array
+  let timelineArray: any[] = []
+
+  if (Array.isArray(data.repos.timeline)) {
+    // Already array (each element likely a repo)
+    timelineArray = data.repos.timeline
+  } else if (typeof data.repos.timeline === "object" && data.repos.timeline !== null) {
+    // Convert object entries like {"2025-03-04": 2}
+    timelineArray = Object.entries(data.repos.timeline).map(([key, value]) => ({
+      created_at: key,
+      count: value,
+    }))
+  }
+
+  // Group and filter
+  const monthlyTimeline = timelineArray
+    .filter((repo) => {
+      const year = new Date(repo.created_at).getFullYear()
+      return year === currentYear
+    })
+    .reduce((acc: Record<string, number>, repo) => {
+      const date = new Date(repo.created_at)
+      const month = date.toLocaleString("default", { month: "short" })
+      acc[month] = (acc[month] || 0) + 1
+      return acc
+    }, {})
+
+  const monthlyTimelineData = Object.entries(monthlyTimeline)
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month))
+
+  // ✅ UI Rendering
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -142,6 +191,7 @@ function DashboardContent() {
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="container mx-auto px-4 py-6 sm:py-8">
         {/* Live Indicator */}
         <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-3 sm:p-4 text-sm sm:text-base">
@@ -235,7 +285,7 @@ function DashboardContent() {
                   0
                 ),
             ],
-            ["Organizations", data.organizations.length],
+            ["Total Commits", data.stats?.totalCommits],
           ].map(([title, value], i) => (
             <Card key={i} className="border-border bg-card">
               <CardHeader className="pb-2">
@@ -252,218 +302,55 @@ function DashboardContent() {
           ))}
         </div>
 
-        {/* Top Repositories */}
-        <Card className="mb-6 border-border bg-card">
-          <CardHeader>
-            <CardTitle>Top Repositories</CardTitle>
-            <CardDescription>Most starred repos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {data.repos.top.map((repo) => (
-                <div
-                  key={repo.name}
-                  className="flex flex-col sm:flex-row sm:items-start sm:justify-between border-b border-border pb-4 last:border-0 last:pb-0"
-                >
-                  <div className="flex-1">
-                    <Link
-                      href={repo.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group mb-1 flex items-center gap-2"
-                    >
-                      <h3 className="font-mono text-sm font-semibold text-foreground group-hover:text-primary sm:text-base">
-                        {repo.name}
-                      </h3>
-                      <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                    </Link>
-                    {repo.description && (
-                      <p className="mb-2 text-xs sm:text-sm text-muted-foreground">
-                        {repo.description}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-                      {repo.language && (
-                        <span className="flex items-center gap-1">
-                          <span className="h-3 w-3 rounded-full bg-primary" />
-                          <span className="font-mono text-muted-foreground">
-                            {repo.language}
-                          </span>
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Star className="h-3 w-3" />
-                        {repo.stargazers_count}
-                      </span>
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <GitFork className="h-3 w-3" />
-                        {repo.forks_count}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Charts */}
-        {/* Charts Grid — Now Truly Responsive Even for Fixed-Size Charts */}
-<div className="grid gap-6 lg:grid-cols-2">
-  {/* Chart Wrapper Utility */}
-  {[
-    {
-      title: "Languages Used",
-      description: "",
-      Component: <LanguageChart data={data.languages} />,
-    },
-    {
-      title: "Repository Creation Timeline",
-      description: "Number of repositories created each year",
-      Component: <RepoTimelineChart data={data.repos.timeline} />,
-    },
-    {
-      title: "Contribution Heatmap",
-      description: "Your GitHub activity over the past year",
-      Component: <ContributionHeatmap data={data.commits.contributions} />,
-      fullWidth: true,
-    },
-  ].map(({ title, description, Component, fullWidth }, i) => (
-    <div key={i} className={fullWidth ? "lg:col-span-2" : ""}>
-      <div className="rounded-lg border border-border bg-card p-3 sm:p-4">
-        <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-base font-semibold text-foreground sm:text-lg">
-            {title}
-          </h3>
-          {description && (
-            <p className="text-xs text-muted-foreground sm:text-sm">
-              {description}
-            </p>
-          )}
-        </div>
-
-        {/* Responsive wrapper — forces charts to scale */}
-        <div
-          className="
-            relative 
-            w-full 
-            overflow-hidden 
-            rounded-md 
-            border border-border/30 
-            bg-background/50
-            p-2
-          "
-        >
-          <div
-            className="
-              w-full 
-              h-auto 
-              min-h-[220px] 
-              sm:min-h-[300px] 
-              flex 
-              items-center 
-              justify-center
-            "
-            style={{
-              transformOrigin: "top left",
-              scale: "1",
-            }}
-          >
-            <div
-              className="
-                w-full 
-                max-w-full 
-                overflow-hidden
-              "
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              {/* Magic scaling container */}
-              <div
-                className="
-                  chart-scale-wrapper 
-                  w-full 
-                  h-auto 
-                  flex 
-                  items-center 
-                  justify-center
-                "
-                style={{
-                  transform: "scale(1)",
-                  transformOrigin: "top",
-                  width: "100%",
-                }}
-              >
-                <div
-                  className="
-                    chart-inner-wrapper 
-                    w-full 
-                    h-auto 
-                    flex 
-                    justify-center 
-                    items-center
-                  "
-                  style={{
-                    width: "100%",
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                  }}
-                >
-                  {Component}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {[
+            {
+              title: "Languages Used",
+              description: "",
+              Component: <LanguageChart data={data.languages} />,
+            },
+            {
+              title: "Repository Creation Timeline (2025 Monthly)",
+              description: "Number of repositories created per month in 2025",
+              Component: <RepoTimelineChart data={monthlyTimelineData} />,
+            },
+            {
+              title: "Contribution Heatmap",
+              description: "Your GitHub activity over the past year",
+              Component: (
+                <ContributionHeatmap data={data.commits.contributions} />
+              ),
+              fullWidth: true,
+            },
+          ].map(({ title, description, Component, fullWidth }, i) => (
+            <div key={i} className={fullWidth ? "lg:col-span-2" : ""}>
+              <div className="rounded-lg border border-border bg-card p-3 sm:p-4">
+                <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-base font-semibold text-foreground sm:text-lg">
+                    {title}
+                  </h3>
+                  {description && (
+                    <p className="text-xs text-muted-foreground sm:text-sm">
+                      {description}
+                    </p>
+                  )}
+                </div>
+                <div className="relative w-full overflow-hidden rounded-md border border-border/30 bg-background/50 p-2">
+                  <div className="w-full h-auto min-h-[220px] sm:min-h-[300px] flex items-center justify-center">
+                    <div className="w-full max-w-full overflow-hidden flex justify-center items-center">
+                      <div className="chart-scale-wrapper w-full h-auto flex items-center justify-center">
+                        <div className="chart-inner-wrapper w-full h-auto flex justify-center items-center overflow-hidden">
+                          {Component}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      </div>
-    </div>
-  ))}
-</div>
-
-
-        {/* Organizations */}
-        {data.organizations.length > 0 && (
-          <Card className="mt-6 border-border bg-card">
-            <CardHeader>
-              <CardTitle>Organizations</CardTitle>
-              <CardDescription>Your org memberships</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {data.organizations.map((org) => (
-                  <div
-                    key={org.login}
-                    className="flex items-center gap-3 rounded-lg border border-border bg-secondary/50 p-3"
-                  >
-                    <Avatar className="h-10 w-10 shrink-0">
-                      <AvatarImage
-                        src={org.avatar_url || "/placeholder.svg"}
-                        alt={org.login}
-                      />
-                      <AvatarFallback>
-                        {org.login[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-mono text-sm font-semibold text-foreground">
-                        {org.login}
-                      </p>
-                      {org.description && (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {org.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </main>
     </div>
   )

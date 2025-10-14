@@ -5,22 +5,27 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 
 interface RepoTimelineChartProps {
-  data: { [year: string]: number }
+  data: { month: string; count: number }[]
 }
 
 export function RepoTimelineChart({ data }: RepoTimelineChartProps) {
-  const chartData = Object.entries(data)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([year, count]) => ({
-      year,
-      repos: count,
-    }))
+  // Ensure all months are represented even if 0 repos
+  const monthOrder = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+  // Merge given data with default 0-count months
+  const filledData = monthOrder.map((month) => {
+    const found = data.find((item) => item.month === month)
+    return {
+      month,
+      repos: found ? found.count : 0,
+    }
+  })
 
   return (
     <Card className="border-border bg-card">
       <CardHeader>
-        <CardTitle>Repository Creation Timeline</CardTitle>
-        <CardDescription>Number of repositories created each year</CardDescription>
+        <CardTitle>Repository Creation Timeline (2025 Monthly)</CardTitle>
+        <CardDescription>Number of repositories created each month in 2025</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -33,12 +38,32 @@ export function RepoTimelineChart({ data }: RepoTimelineChartProps) {
           className="h-[300px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+            <BarChart
+              data={filledData}
+              margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-              <XAxis dataKey="year" stroke="#8b949e" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#8b949e" fontSize={12} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="month"
+                stroke="#8b949e"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#8b949e"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="repos" fill="#58a6ff" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="repos"
+                fill="#58a6ff"
+                radius={[4, 4, 0, 0]}
+                isAnimationActive={true}
+                animationDuration={900}
+              />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>

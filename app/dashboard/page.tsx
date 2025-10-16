@@ -39,16 +39,16 @@ function DashboardContent() {
   // No username
   if (!username) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-3 sm:p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1.5 p-4 sm:p-6">
-            <CardTitle className="text-lg sm:text-xl">No Username Provided</CardTitle>
-            <CardDescription className="text-sm">
+          <CardHeader>
+            <CardTitle>No Username Provided</CardTitle>
+            <CardDescription>
               Please enter a GitHub username to view the dashboard.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-            <Button onClick={() => router.push("/")} className="w-full" size="sm">
+          <CardContent>
+            <Button onClick={() => router.push("/")} className="w-full">
               Go Back
             </Button>
           </CardContent>
@@ -60,12 +60,12 @@ function DashboardContent() {
   // Loading State
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6">
+      <div className="min-h-screen bg-background p-4 sm:p-6">
         <div className="mx-auto max-w-7xl">
-          <Skeleton className="mb-4 h-8 w-32 sm:mb-6 sm:h-10 sm:w-48 md:h-12 md:w-64" />
-          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          <Skeleton className="mb-6 h-10 w-48 sm:h-12 sm:w-64" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-32 sm:h-40 md:h-48" />
+              <Skeleton key={i} className="h-40 sm:h-48" />
             ))}
           </div>
         </div>
@@ -76,22 +76,21 @@ function DashboardContent() {
   // Error State
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-3 sm:p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md border-destructive">
-          <CardHeader className="space-y-1.5 p-4 sm:p-6">
-            <CardTitle className="text-lg text-destructive sm:text-xl">Error</CardTitle>
-            <CardDescription className="text-sm">{error}</CardDescription>
+          <CardHeader>
+            <CardTitle className="text-destructive">Error</CardTitle>
+            <CardDescription>{error}</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-2 p-4 pt-0 sm:flex-row sm:gap-3 sm:p-6 sm:pt-0">
+          <CardContent className="flex flex-col gap-3 sm:flex-row">
             <Button
               onClick={() => router.push("/")}
               variant="outline"
-              size="sm"
               className="flex-1"
             >
               Go Back
             </Button>
-            <Button onClick={refresh} size="sm" className="flex-1">
+            <Button onClick={refresh} className="flex-1">
               Try Again
             </Button>
           </CardContent>
@@ -123,8 +122,10 @@ function DashboardContent() {
   let timelineArray: any[] = []
 
   if (Array.isArray(data.repos.timeline)) {
+    // Already array (each element likely a repo)
     timelineArray = data.repos.timeline
   } else if (typeof data.repos.timeline === "object" && data.repos.timeline !== null) {
+    // Convert object entries like {"2025-03-04": 2}
     timelineArray = Object.entries(data.repos.timeline).map(([key, value]) => ({
       created_at: key,
       count: value,
@@ -153,38 +154,36 @@ function DashboardContent() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3 md:py-4">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="container mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:py-4">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.push("/")}
-              className="h-8 w-8 hover:bg-card sm:h-10 sm:w-10"
+              className="hover:bg-card"
             >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="font-mono text-sm font-bold sm:text-lg md:text-xl">
+            <h1 className="font-mono text-lg font-bold sm:text-xl">
               GitHub Insight Dashboard
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="flex-1 sm:flex-initial">
-              <RefreshIndicator
-                lastRefresh={lastRefresh}
-                timeUntilNextRefresh={timeUntilNextRefresh}
-                loading={loading}
-              />
-            </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <RefreshIndicator
+              lastRefresh={lastRefresh}
+              timeUntilNextRefresh={timeUntilNextRefresh}
+              loading={loading}
+            />
             <Button
               variant="outline"
               size="sm"
               onClick={refresh}
               disabled={loading}
-              className="h-8 flex-1 text-xs sm:h-9 sm:flex-initial sm:text-sm"
+              className="w-full sm:w-auto"
             >
               <RefreshCw
-                className={`mr-1.5 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4 ${loading ? "animate-spin" : ""}`}
+                className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
               />
               Refresh
             </Button>
@@ -193,12 +192,12 @@ function DashboardContent() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-3 py-4 sm:px-4 sm:py-6 md:py-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
         {/* Live Indicator */}
-        <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-2.5 text-xs sm:mb-6 sm:p-3 sm:text-sm md:p-4 md:text-base">
+        <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-3 sm:p-4 text-sm sm:text-base">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
             <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary sm:h-2 sm:w-2" />
+              <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
               <span className="font-semibold text-foreground">
                 Live Updates Enabled
               </span>
@@ -210,9 +209,9 @@ function DashboardContent() {
         </div>
 
         {/* Profile Overview */}
-        <Card className="mb-4 border-border bg-card sm:mb-6">
-          <CardContent className="flex flex-col gap-3 p-3 sm:flex-row sm:gap-4 sm:p-4 md:gap-6 md:p-6">
-            <Avatar className="h-16 w-16 self-center ring-2 ring-primary/20 sm:h-20 sm:w-20 sm:self-start md:h-24 md:w-24">
+        <Card className="mb-6 border-border bg-card">
+          <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:gap-6 sm:p-6">
+            <Avatar className="h-20 w-20 sm:h-24 sm:w-24 ring-2 ring-primary/20">
               <AvatarImage
                 src={data.user.avatar_url || "/placeholder.svg"}
                 alt={data.user.login}
@@ -220,9 +219,9 @@ function DashboardContent() {
               <AvatarFallback>{data.user.login[0].toUpperCase()}</AvatarFallback>
             </Avatar>
 
-            <div className="flex-1 text-center sm:text-left">
-              <div className="mb-2 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
-                <h2 className="text-lg font-bold sm:text-xl md:text-2xl">
+            <div className="flex-1">
+              <div className="mb-2 flex flex-wrap items-center gap-2 sm:gap-3">
+                <h2 className="text-xl font-bold sm:text-2xl">
                   {data.user.name || data.user.login}
                 </h2>
                 <Link
@@ -233,36 +232,36 @@ function DashboardContent() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 gap-1.5 bg-transparent text-xs sm:h-8 sm:gap-2 sm:text-sm"
+                    className="gap-2 bg-transparent"
                   >
-                    <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <ExternalLink className="h-4 w-4" />
                     View
                   </Button>
                 </Link>
               </div>
 
-              <p className="mb-2 font-mono text-xs text-muted-foreground sm:text-sm">
+              <p className="mb-2 font-mono text-xs sm:text-sm text-muted-foreground">
                 @{data.user.login}
               </p>
               {data.user.bio && (
-                <p className="mb-3 text-xs leading-relaxed text-foreground sm:text-sm">
+                <p className="mb-3 text-sm leading-relaxed text-foreground">
                   {data.user.bio}
                 </p>
               )}
 
-              <div className="flex flex-wrap justify-center gap-2 text-xs sm:justify-start sm:gap-3 sm:text-sm">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Users className="h-3 w-3 text-muted-foreground sm:h-4 sm:w-4" />
+              <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="font-semibold">{data.user.followers}</span>
                   <span className="text-muted-foreground">followers</span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Users className="h-3 w-3 text-muted-foreground sm:h-4 sm:w-4" />
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="font-semibold">{data.user.following}</span>
                   <span className="text-muted-foreground">following</span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Calendar className="h-3 w-3 text-muted-foreground sm:h-4 sm:w-4" />
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">
                     Joined{" "}
                     {new Date(data.user.created_at).toLocaleDateString()}
@@ -274,7 +273,7 @@ function DashboardContent() {
         </Card>
 
         {/* Stats Grid */}
-        <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-4 lg:grid-cols-4">
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["Total Repositories", data.repos.total],
             ["Languages Used", Object.keys(data.languages).length],
@@ -289,13 +288,13 @@ function DashboardContent() {
             ["Total Commits", data.stats?.totalCommits],
           ].map(([title, value], i) => (
             <Card key={i} className="border-border bg-card">
-              <CardHeader className="p-2.5 pb-1.5 sm:p-3 sm:pb-2 md:pb-2">
-                <CardTitle className="text-[10px] font-medium text-muted-foreground sm:text-xs md:text-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm">
                   {title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-2.5 pt-0 sm:p-3 sm:pt-0">
-                <div className="text-xl font-bold text-foreground sm:text-2xl md:text-3xl">
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground sm:text-3xl">
                   {value as string}
                 </div>
               </CardContent>
@@ -304,8 +303,9 @@ function DashboardContent() {
         </div>
 
         {/* Charts */}
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           {[
+            
             {
               title: "Contribution Heatmap",
               description: "Your GitHub activity over the past year",
@@ -316,22 +316,22 @@ function DashboardContent() {
             },
           ].map(({ title, description, Component, fullWidth }, i) => (
             <div key={i} className={fullWidth ? "lg:col-span-2" : ""}>
-              <div className="rounded-lg border border-border bg-card p-2.5 sm:p-3 md:p-4">
-                <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
-                  <h3 className="text-sm font-semibold text-foreground sm:text-base md:text-lg">
+              <div className="rounded-lg border border-border bg-card p-3 sm:p-4">
+                <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-base font-semibold text-foreground sm:text-lg">
                     {title}
                   </h3>
                   {description && (
-                    <p className="text-[10px] text-muted-foreground sm:text-xs md:text-sm">
+                    <p className="text-xs text-muted-foreground sm:text-sm">
                       {description}
                     </p>
                   )}
                 </div>
-                <div className="relative w-full overflow-x-auto overflow-y-hidden rounded-md border border-border/30 bg-background/50 p-1.5 sm:p-2">
-                  <div className="w-full min-h-[180px] flex items-center justify-center sm:min-h-[220px] md:min-h-[280px] lg:min-h-[300px]">
-                    <div className="w-full max-w-full overflow-x-auto overflow-y-hidden flex justify-start sm:justify-center items-center">
-                      <div className="chart-scale-wrapper w-full min-w-[500px] sm:min-w-0 flex items-center justify-center">
-                        <div className="chart-inner-wrapper w-full flex justify-center items-center">
+                <div className="relative w-full overflow-hidden rounded-md border border-border/30 bg-background/50 p-2">
+                  <div className="w-full h-auto min-h-[220px] sm:min-h-[300px] flex items-center justify-center">
+                    <div className="w-full max-w-full overflow-hidden flex justify-center items-center">
+                      <div className="chart-scale-wrapper w-full h-auto flex items-center justify-center">
+                        <div className="chart-inner-wrapper w-full h-auto flex justify-center items-center overflow-hidden">
                           {Component}
                         </div>
                       </div>
@@ -351,10 +351,10 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center p-3 sm:p-4">
+        <div className="flex min-h-screen items-center justify-center p-4">
           <div className="text-center">
-            <RefreshCw className="mx-auto mb-3 h-6 w-6 animate-spin text-primary sm:mb-4 sm:h-8 sm:w-8" />
-            <p className="text-sm text-muted-foreground sm:text-base">Loading dashboard...</p>
+            <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading dashboard...</p>
           </div>
         </div>
       }

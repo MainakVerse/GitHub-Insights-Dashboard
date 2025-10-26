@@ -4,6 +4,21 @@ A sleek, fully responsive **Next.js + TypeScript** dashboard that visualizes a u
 
 Built with modern UI using **shadcn/ui**, **TailwindCSS**, and **Recharts**, this app offers real-time GitHub insights with auto-refreshing data.
 
+<!-- 🏷️ GitHub Badges -->
+![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn/ui-black?logo=react&logoColor=61DAFB)
+![Recharts](https://img.shields.io/badge/Recharts-0088FE?logo=recharts&logoColor=white)
+![lucide-react](https://img.shields.io/badge/lucide--react-121212?logo=react&logoColor=61DAFB)
+![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)
+![License](https://img.shields.io/github/license/MainakVerse/Github-Insight-Dashboard)
+![Stars](https://img.shields.io/github/stars/MainakVerse/Github-Insight-Dashboard?style=social)
+![Forks](https://img.shields.io/github/forks/MainakVerse/Github-Insight-Dashboard?style=social)
+![Issues](https://img.shields.io/github/issues/MainakVerse/Github-Insight-Dashboard)
+![Pull Requests](https://img.shields.io/github/issues-pr/MainakVerse/Github-Insight-Dashboard)
+![Last Commit](https://img.shields.io/github/last-commit/MainakVerse/Github-Insight-Dashboard)
+
 ---
 
 ## 🚀 Features
